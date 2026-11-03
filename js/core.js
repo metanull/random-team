@@ -133,6 +133,10 @@
   //
   // Anyone who reads this source can decode a code: the goal is only that the name cannot be
   // read at a glance (on screen, in a QR code or in a URL).
+  //
+  // Decoding is deterministic: a code depends only on this format, never on the draw, so a code always
+  // decodes to the same name. Do NOT change SALT, the layout or the PRNG: links already handed out
+  // would stop working (tests/core.test.js has frozen fixtures to catch this).
 
   var NONCE_BYTES = 4;
   var BLOCK_BYTES = 1 + MAX_NAME_BYTES + 1; // 44

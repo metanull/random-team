@@ -25,7 +25,7 @@ page is closed or reloaded.
    marked as informed. Showing a pair again takes an extra confirmation.
 4. Once everyone has been informed, tap **Finish**. The pairing is erased.
 
-### Two ways to show the pair (Options)
+### Two ways to show the pair (toggle on the setup screen)
 
 | Mode | What the participant sees | Pros | Cons |
 |---|---|---|---|
@@ -39,13 +39,16 @@ In QR mode the link looks like `…/r.html#<64-character code>`:
   away.
 - The same name gives a **different code every time** because of a random nonce and random padding.
 - A **check byte** rejects codes that are mistyped or changed.
+- **Decoding is deterministic:** a code depends only on the name, never on the draw, so a link
+  always shows the same name, even after later draws. Frozen test fixtures make sure future changes
+  keep old links working.
 - This is **obfuscation, not encryption.** Anyone who reads `js/core.js` can decode a code. It only
   stops someone from reading the name at a glance.
 
 Names are limited to 42 bytes of UTF-8, which is about 42 Latin letters or fewer accented or non-Latin
 characters, so they fit in the fixed-size code.
 
-### Pairing styles (Options)
+### Pairing styles (More options)
 
 - **Fully random** (default): a uniformly random *derangement*. Every valid pairing is equally likely,
   mutual pairs included.
@@ -54,14 +57,12 @@ characters, so they fit in the fixed-size code.
 
 ## Hosting on GitHub Pages
 
-The app is plain HTML, CSS and JavaScript, with no build step:
+The app is plain HTML, CSS and JavaScript, with no build step. The workflow
+`.github/workflows/pages.yml` runs the tests on every push and pull request. When the push is on the
+repository's **default branch**, it also publishes the app files to GitHub Pages. This needs
+*Settings → Pages → Source: GitHub Actions*.
 
-1. In the repository, open **Settings → Pages**.
-2. Under *Build and deployment*, set **Source: Deploy from a branch**.
-3. Pick the branch, e.g. `main`, and the folder **`/ (root)`**.
-
-The app is then served at `https://<owner>.github.io/<repo>/`. The `.nojekyll` file makes GitHub serve
-the files as they are.
+The app is served at `https://<owner>.github.io/<repo>/`.
 
 To run it locally, open `index.html` directly, or serve the folder with
 `python3 -m http.server` and open <http://localhost:8000>. QR mode needs a URL that the phones can
