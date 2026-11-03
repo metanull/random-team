@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Random Team</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="app">
+
+    <!-- 1. Setup: the operator enters the names -->
+    <section id="screen-setup" class="screen">
+      <header>
+        <h1>Random Team</h1>
+        <p class="muted">Secretly pair everyone in a list with someone else.</p>
+      </header>
+
+      <form id="add-form" class="row" autocomplete="off">
+        <label class="sr-only" for="name-input">Name</label>
+        <input id="name-input" type="text" placeholder="Add a name…" enterkeyhint="done" autocapitalize="words">
+        <button type="submit" class="btn">Add</button>
+      </form>
+      <p id="add-error" class="error" role="alert" hidden></p>
+
+      <div class="list-head">
+        <h2><span id="name-count">0</span> participants</h2>
+        <button id="clear-btn" type="button" class="btn-link" hidden>Clear list</button>
+      </div>
+      <ol id="name-list" class="names"></ol>
+      <p id="empty-hint" class="muted">Type a name and press Enter. You can also paste several names separated by new lines or commas. The list is kept on this device.</p>
+
+      <details class="options">
+        <summary>Options</summary>
+        <fieldset>
+          <legend>How participants see their pair</legend>
+          <label><input type="radio" name="reveal" value="screen" checked> On this screen (tap to show, tap to hide)</label>
+          <label><input type="radio" name="reveal" value="qr"> QR code / link to open on their own phone</label>
+          <p id="file-warning" class="warn" hidden>This page is opened from a local file: phones won't be able to open the QR links. Use the hosted version (e.g. GitHub Pages) for the QR mode.</p>
+        </fieldset>
+        <fieldset>
+          <legend>Pairing style</legend>
+          <label><input type="radio" name="mode" value="any" checked> Fully random (A→B and B→A may happen)</label>
+          <label><input type="radio" name="mode" value="loop"> Single loop (A→B→C→…→A, no mutual pairs)</label>
+        </fieldset>
+      </details>
+
+      <button id="start-btn" type="button" class="btn btn-primary btn-block" disabled>Start the draw</button>
+      <p id="start-hint" class="muted center"></p>
+    </section>
+
+    <!-- 2. Hand-out: the operator picks who's next -->
+    <section id="screen-handout" class="screen" hidden>
+      <header>
+        <h1>Draw done</h1>
+        <p class="muted">Pick the next participant, then hand them the device.
+          <br><strong id="progress">0 / 0</strong> informed.</p>
+      </header>
+      <div id="people" class="people"></div>
+      <div id="all-done" class="done-box" hidden>
+        <p><strong>Everyone has been informed.</strong></p>
+        <p class="muted">The pairing only exists in this page's memory: it is lost when you leave or reload.</p>
+      </div>
+      <button id="end-btn" type="button" class="btn btn-block">End the draw</button>
+    </section>
+
+    <!-- 3. Hand-over: confirm the participant holds the device -->
+    <section id="screen-handover" class="screen screen-center" hidden>
+      <p class="muted">Hand the device to</p>
+      <p class="big-name" id="handover-name"></p>
+      <p class="muted">Make sure nobody else can see the screen.</p>
+      <button id="show-btn" type="button" class="btn btn-primary btn-xl">I'm <span id="handover-name-2"></span> — show my pair</button>
+      <button id="handover-cancel" type="button" class="btn-link">Not me — go back</button>
+    </section>
+
+    <!-- 4. Reveal -->
+    <section id="screen-reveal" class="screen screen-center" hidden>
+      <p class="muted"><span id="reveal-giver"></span>, you are paired with</p>
+      <div id="reveal-screen">
+        <p class="big-name secret" id="reveal-name"></p>
+      </div>
+      <div id="reveal-qr" hidden>
+        <div id="qr" class="qr" role="img" aria-label="QR code"></div>
+        <p class="muted small">Scan it with your phone to see the name there.<br>No camera? Open this link:</p>
+        <p class="code small" id="qr-link"></p>
+      </div>
+      <button id="hide-btn" type="button" class="btn btn-primary btn-xl">Hide &amp; hand back</button>
+    </section>
+
+  </main>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
