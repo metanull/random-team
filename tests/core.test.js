@@ -82,6 +82,19 @@ test('codec: decoding is deterministic and stable across draws and versions', ()
   }
 });
 
+test('link: drawn name + recipient, old links still work', () => {
+  const frag = RT.encodeLink('Chloé', 'Alice');
+  assert.equal(frag.length, RT.CODE_LENGTH * 2 + 1);
+  assert.deepEqual(RT.decodeLink(frag), { name: 'Chloé', recipient: 'Alice' });
+  assert.deepEqual(RT.decodeLink('#' + frag), { name: 'Chloé', recipient: 'Alice' });
+  // Links handed out before the recipient part existed (code only)
+  const old = 'P9UsRRZbuqHz0iyEAaOxkZu4r2WZ-1PhH2q8C-ziDTZ1Bt6hbPObQ3gwTG1HprOr';
+  assert.deepEqual(RT.decodeLink(old), { name: 'Alice', recipient: null });
+  // A broken recipient part only drops the greeting; a broken drawn-name code is an error
+  assert.deepEqual(RT.decodeLink(old + '.garbage'), { name: 'Alice', recipient: null });
+  assert.throws(() => RT.decodeLink('garbage.' + old));
+});
+
 test('codec: rejects too long or empty names', () => {
   assert.throws(() => RT.encode(''));
   assert.throws(() => RT.encode('x'.repeat(RT.MAX_NAME_BYTES + 1)));

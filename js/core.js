@@ -227,6 +227,27 @@
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Link fragment:  #<code of the drawn name>.<code of the recipient>
+  // ---------------------------------------------------------------------------
+  // The recipient part only lets the participant page say "Hello <recipient>", so a link sent to the
+  // wrong person is noticed. It is optional: older links (code only) still decode the same way.
+
+  function encodeLink(drawnName, recipientName) {
+    return encode(drawnName) + (recipientName ? '.' + encode(recipientName) : '');
+  }
+
+  /** @returns {{ name: string, recipient: string|null }}  Throws if the drawn-name code is invalid. */
+  function decodeLink(fragment) {
+    var parts = String(fragment || '').replace(/^#/, '').split('.');
+    var name = decode(parts[0]);
+    var recipient = null;
+    if (parts.length > 1) {
+      try { recipient = decode(parts[1]); } catch (e) { recipient = null; } // greeting only: ignore if broken
+    }
+    return { name: name, recipient: recipient };
+  }
+
   return {
     randomInt: randomInt,
     shuffle: shuffle,
@@ -239,6 +260,8 @@
     MAX_NAME_BYTES: MAX_NAME_BYTES,
     CODE_LENGTH: CODE_LENGTH,
     encode: encode,
-    decode: decode
+    decode: decode,
+    encodeLink: encodeLink,
+    decodeLink: decodeLink
   };
 });

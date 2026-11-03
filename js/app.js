@@ -254,7 +254,7 @@
     if (qrMode) {
       // The language is not secret: it goes in the query string. The code goes in the fragment (#),
       // which browsers never send to the server.
-      var url = linkFor(target);
+      var url = linkFor(current);
       revealUrl = url;
       renderQr(url);
       $('qr-link').textContent = url;
@@ -294,13 +294,14 @@
   var dialogCtx = null;   // { url, onSent } while the fallback dialog is open
   var leavingForApp = 0;  // timestamp: an sms:/mailto: link was just opened (see beforeunload)
 
-  /** Participant link for a drawn name. The language is not secret: it goes in the query string.
-   *  The code goes in the fragment (#), which browsers never send to any server. */
-  function linkFor(targetName) {
+  /** Participant link for participant i: their drawn name, plus their own name for the greeting.
+   *  The language is not secret: it goes in the query string. The codes go in the fragment (#),
+   *  which browsers never send to any server. */
+  function linkFor(i) {
     var page = new URL('r.html', location.href);
     page.search = '?lang=' + window.I18n.getLang();
     page.hash = '';
-    return page.href + '#' + RT.encode(targetName);
+    return page.href + '#' + RT.encodeLink(draw.names[draw.targets[i]], draw.names[i]);
   }
 
   /** Send `url` to participant `i` with an app of this device. `onSent` runs once it was handed over. */
@@ -370,7 +371,7 @@
     if (!draw) return;
     if (draw.seen[i] && !confirm(t('confirmReshare', { name: draw.names[i] }))) return;
     var d = draw;
-    share(i, linkFor(d.names[d.targets[i]]), function () {
+    share(i, linkFor(i), function () {
       if (draw !== d) return; // the draw was cancelled meanwhile
       d.seen[i] = true;
       renderHandout();

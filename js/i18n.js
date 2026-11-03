@@ -79,6 +79,8 @@
 
       phonePrivacy: 'Make sure nobody else can see your screen.',
       phoneShow: 'Show my pair',
+      phoneHello: 'Hello {name}!',
+      phoneWrongPerson: 'This link is meant for {name}. If that\'s not you, don\'t go any further and let the organiser know.',
       phoneIntro: 'You are paired with',
       phoneHide: 'Hide',
       phoneKeep: 'Keep this link to see it again later.',
@@ -149,6 +151,8 @@
 
       phonePrivacy: 'Assurez-vous que personne d\'autre ne voit votre écran.',
       phoneShow: 'Afficher mon tirage',
+      phoneHello: 'Bonjour {name} !',
+      phoneWrongPerson: 'Ce lien est destiné à {name}. Si ce n\'est pas vous, n\'allez pas plus loin et prévenez l\'organisateur.',
       phoneIntro: 'Vous avez tiré',
       phoneHide: 'Masquer',
       phoneKeep: 'Gardez ce lien pour le revoir plus tard.',
