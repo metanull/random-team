@@ -32,8 +32,12 @@ page is closed or reloaded.
 | **On this screen** (default) | The name, in large type, on the operator's device | Simple, works offline, no phone needed | The participant must remember it |
 | **QR code / link** | A QR code (and the link under it) that they scan with their own phone | The participant keeps the result on their phone and can open it again later | Needs the app to be hosted (not opened as a local file) and a phone with a camera |
 
-In QR mode the link looks like `…/r.html#<64-character code>`:
+In QR mode the link looks like `…/r.html?lang=en#<code of the drawn name>.<code of the recipient>`:
 
+- **The recipient part** lets the page greet the participant: "Hello Bob! This link is meant for Bob. If
+  that's not you, don't go any further and let the organiser know." Someone who gets the wrong link
+  notices it before revealing anything. It's a message only, with no check behind it. Links without
+  this part still work; they just don't show the greeting.
 - The code goes **after the `#`**, so the browser never sends it to the web server.
 - Every code is **exactly 64 characters**, whatever the name's length, so its length gives nothing
   away.

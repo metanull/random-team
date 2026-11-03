@@ -192,3 +192,7 @@ header.top { display: flex; align-items: flex-start; justify-content: space-betw
 .sheet-title { font-weight: 700; margin: 0 0 4px; text-align: center; }
 .sheet .btn-block { margin-top: 12px; }
 #share-dialog-status:empty { display: none; }
+
+/* Participant page greeting */
+.hello { font-size: 1.6rem; font-weight: 800; margin: 0 0 4px; overflow-wrap: anywhere; }
+#hello { margin-bottom: 16px; }
