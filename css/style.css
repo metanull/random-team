@@ -133,13 +133,25 @@ input[type=text]:focus, .btn:focus-visible { outline: 2px solid var(--primary); 
 /* Hand-out */
 .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .person {
-  appearance: none; text-align: left; font: inherit; color: var(--text);
+  display: flex; align-items: stretch;
   background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius);
-  padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 4px;
+  overflow: hidden;
+}
+.person:hover { border-color: var(--primary); }
+.person-main {
+  appearance: none; flex: 1; min-width: 0; text-align: left; font: inherit; color: var(--text);
+  background: none; border: 0; padding: 14px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
 }
 .person .name { font-weight: 600; overflow-wrap: anywhere; }
 .person .status { font-size: 0.8rem; color: var(--muted); }
-.person:hover { border-color: var(--primary); }
+.person-share {
+  appearance: none; flex: none; width: 48px; border: 0; border-left: 1px solid var(--border);
+  background: none; color: var(--primary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.person-share:hover { background: var(--bg); }
+.person-main:focus-visible, .person-share:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 .person.seen { opacity: 0.6; border-style: dashed; }
 .person.seen .status { color: var(--ok); }
 .done-box { margin-top: 20px; padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--ok); }
@@ -170,3 +182,13 @@ header.top { display: flex; align-items: flex-start; justify-content: space-betw
 .share-fallback { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
 .share-fallback .btn { display: block; text-align: center; text-decoration: none; }
 #share-status:empty { display: none; }
+
+/* Share fallback dialog */
+.sheet {
+  width: min(92vw, 420px); border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); padding: 18px 16px;
+}
+.sheet::backdrop { background: rgba(0, 0, 0, 0.45); }
+.sheet-title { font-weight: 700; margin: 0 0 4px; text-align: center; }
+.sheet .btn-block { margin-top: 12px; }
+#share-dialog-status:empty { display: none; }

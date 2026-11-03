@@ -184,15 +184,29 @@
     var box = $('people');
     box.textContent = '';
     var done = 0;
+    var qrMode = draw.reveal === 'qr';
     draw.names.forEach(function (name, i) {
-      var b = el('button', 'person' + (draw.seen[i] ? ' seen' : ''));
+      var tile = el('div', 'person' + (draw.seen[i] ? ' seen' : ''));
+      var b = el('button', 'person-main');
       b.type = 'button';
       b.appendChild(el('span', 'name', name));
       b.appendChild(el('span', 'status', t(draw.seen[i] ? 'statusSeen' : 'statusWaiting')));
       b.addEventListener('click', function () { pick(i); });
-      box.appendChild(b);
+      tile.appendChild(b);
+      if (qrMode) {
+        // Send this person's link directly, without handing the device over.
+        var s = el('button', 'person-share');
+        s.type = 'button';
+        s.title = t('shareFor', { name: name });
+        s.setAttribute('aria-label', s.title);
+        s.innerHTML = SHARE_ICON;
+        s.addEventListener('click', function () { shareFromList(i); });
+        tile.appendChild(s);
+      }
+      box.appendChild(tile);
       if (draw.seen[i]) done++;
     });
+    $('handout-help').textContent = t(qrMode ? 'handoutHelpQr' : 'handoutHelp');
     $('progress').textContent = t('progress', { done: done, total: draw.names.length });
     $('all-done').hidden = done !== draw.names.length;
     $('end-btn').textContent = t(done === draw.names.length ? 'finish' : 'cancelDraw');
@@ -240,13 +254,11 @@
     if (qrMode) {
       // The language is not secret: it goes in the query string. The code goes in the fragment (#),
       // which browsers never send to the server.
-      var page = new URL('r.html', location.href);
-      page.search = '?lang=' + window.I18n.getLang();
-      page.hash = '';
-      var url = page.href + '#' + RT.encode(target);
+      var url = linkFor(target);
+      revealUrl = url;
       renderQr(url);
       $('qr-link').textContent = url;
-      prepareShare(draw.names[current], url);
+      $('share-status').textContent = '';
     } else {
       $('reveal-name').textContent = target;
     }
@@ -274,45 +286,96 @@
   // (Web Share) when available, otherwise plain WhatsApp / SMS / e-mail links and copy.
   // ---------------------------------------------------------------------------
 
-  var shareData = null;
+  var SHARE_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>' +
+    '<circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
 
-  function prepareShare(recipient, url) {
-    var text = t('shareText', { name: recipient });
-    shareData = { title: 'Random Team', text: text, url: url };
+  var revealUrl = null;   // link shown on the reveal screen
+  var dialogCtx = null;   // { url, onSent } while the fallback dialog is open
+  var leavingForApp = 0;  // timestamp: an sms:/mailto: link was just opened (see beforeunload)
+
+  /** Participant link for a drawn name. The language is not secret: it goes in the query string.
+   *  The code goes in the fragment (#), which browsers never send to any server. */
+  function linkFor(targetName) {
+    var page = new URL('r.html', location.href);
+    page.search = '?lang=' + window.I18n.getLang();
+    page.hash = '';
+    return page.href + '#' + RT.encode(targetName);
+  }
+
+  /** Send `url` to participant `i` with an app of this device. `onSent` runs once it was handed over. */
+  function share(i, url, onSent) {
+    var text = t('shareText', { name: draw.names[i] });
+    if (navigator.share) {
+      navigator.share({ title: 'Random Team', text: text, url: url }).then(onSent, function (err) {
+        if (err && err.name === 'AbortError') return; // the operator closed the share sheet
+        openShareDialog(i, url, text, onSent);
+      });
+    } else {
+      openShareDialog(i, url, text, onSent);
+    }
+  }
+
+  function openShareDialog(i, url, text, onSent) {
     var body = text + '\n' + url;
+    $('share-dialog-title').textContent = t('shareFor', { name: draw.names[i] });
     $('share-whatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(body);
     $('share-sms').href = 'sms:?&body=' + encodeURIComponent(body);
     $('share-mail').href = 'mailto:?subject=' + encodeURIComponent(t('shareSubject')) + '&body=' + encodeURIComponent(body);
-    $('share-fallback').hidden = true;
-    $('share-btn').hidden = false;
-    $('share-status').textContent = '';
+    $('share-dialog-status').textContent = '';
+    dialogCtx = { url: url, onSent: onSent };
+    var d = $('share-dialog');
+    if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
   }
 
-  $('share-btn').addEventListener('click', function () {
-    if (!shareData) return;
-    if (navigator.share) {
-      navigator.share(shareData).then(function () {
-        $('share-status').textContent = t('shareDone');
-      }, function (err) {
-        if (err && err.name === 'AbortError') return; // the operator closed the share sheet
-        $('share-fallback').hidden = false;
-      });
-    } else {
-      $('share-fallback').hidden = false;
-      $('share-btn').hidden = true;
-    }
+  function closeShareDialog() {
+    dialogCtx = null;
+    ['share-whatsapp', 'share-sms', 'share-mail'].forEach(function (id) { $(id).removeAttribute('href'); });
+    $('share-dialog-status').textContent = '';
+    var d = $('share-dialog');
+    if (d.open) { if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); }
+  }
+
+  ['share-whatsapp', 'share-sms', 'share-mail'].forEach(function (id) {
+    $(id).addEventListener('click', function () {
+      if (!dialogCtx) return;
+      leavingForApp = Date.now();
+      $('share-dialog-status').textContent = t('shareDone');
+      dialogCtx.onSent();
+    });
   });
 
   $('copy-btn').addEventListener('click', function () {
-    if (!shareData) return;
-    var done = function () { $('share-status').textContent = t('copied'); };
-    var url = shareData.url;
+    if (!dialogCtx) return;
+    var ctx = dialogCtx;
+    var done = function () { $('share-dialog-status').textContent = t('copied'); ctx.onSent(); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(done, function () { legacyCopy(url) && done(); });
-    } else if (legacyCopy(url)) {
+      navigator.clipboard.writeText(ctx.url).then(done, function () { if (legacyCopy(ctx.url)) done(); });
+    } else if (legacyCopy(ctx.url)) {
       done();
     }
   });
+
+  $('share-dialog-close').addEventListener('click', closeShareDialog);
+  $('share-dialog').addEventListener('close', function () { dialogCtx = null; });
+
+  // Reveal screen: share the link that is displayed. The participant is marked on "Hide".
+  $('share-btn').addEventListener('click', function () {
+    if (!draw || current < 0 || !revealUrl) return;
+    share(current, revealUrl, function () { $('share-status').textContent = t('shareDone'); });
+  });
+
+  // Hand-out list: share a participant's link directly, then mark them as informed.
+  function shareFromList(i) {
+    if (!draw) return;
+    if (draw.seen[i] && !confirm(t('confirmReshare', { name: draw.names[i] }))) return;
+    var d = draw;
+    share(i, linkFor(d.names[d.targets[i]]), function () {
+      if (draw !== d) return; // the draw was cancelled meanwhile
+      d.seen[i] = true;
+      renderHandout();
+    });
+  }
 
   function legacyCopy(text) {
     var ta = document.createElement('textarea');
@@ -329,9 +392,8 @@
   }
 
   function clearSecret() {
-    shareData = null;
-    ['share-whatsapp', 'share-sms', 'share-mail'].forEach(function (id) { $(id).removeAttribute('href'); });
-    $('share-fallback').hidden = true;
+    revealUrl = null;
+    closeShareDialog();
     $('share-status').textContent = '';
     $('reveal-name').textContent = '';
     $('reveal-intro').textContent = '';
@@ -341,6 +403,8 @@
 
   // Leaving the page loses the draw: ask first.
   window.addEventListener('beforeunload', function (e) {
+    // Opening an sms:/mailto: link can fire beforeunload in some browsers: don't warn for that.
+    if (Date.now() - leavingForApp < 2000) return;
     if (draw && !draw.seen.every(Boolean)) {
       e.preventDefault();
       e.returnValue = '';
