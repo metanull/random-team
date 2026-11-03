@@ -9,8 +9,9 @@
     ['ready', 'shown', 'error'].forEach(function (s) { $('state-' + s).hidden = s !== which; });
   }
 
-  function fail(msg) {
-    $('error-msg').textContent = msg;
+  function fail(key) {
+    $('error-msg').setAttribute('data-i18n', key);
+    $('error-msg').textContent = window.I18n.t(key);
     state('error');
   }
 
@@ -20,11 +21,11 @@
     var code = location.hash.replace(/^#/, '');
     name = null;
     $('name').textContent = '';
-    if (!code) return fail('This page shows the name you were paired with. Open it by scanning the QR code shown by the organiser.');
+    if (!code) return fail('phoneNoCode');
     try {
       name = window.RandomTeam.decode(code);
     } catch (e) {
-      return fail('This link is invalid or incomplete. Ask the organiser to show the QR code again.');
+      return fail('phoneInvalid');
     }
     state('ready');
   }
@@ -40,6 +41,7 @@
     state('ready');
   });
 
+  window.I18n.init();
   window.addEventListener('hashchange', init);
   init();
 })();

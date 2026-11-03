@@ -3,6 +3,7 @@
   'use strict';
 
   var RT = window.RandomTeam;
+  var t = window.I18n.t;
   var STORE_KEY = 'random-team.v1';
 
   // ---------------------------------------------------------------------------
@@ -63,25 +64,33 @@
   var input = $('name-input');
   var addError = $('add-error');
 
-  function setError(msg) {
-    addError.textContent = msg || '';
+  var problems = []; // [{ key, name }] kept so they can be re-translated
+
+  function renderError() {
+    var msg = problems.map(function (p) { return t(p.key, { name: p.name }); }).join(' ');
+    addError.textContent = msg;
     addError.hidden = !msg;
+  }
+
+  function setProblems(list) {
+    problems = list;
+    renderError();
   }
 
   function addNames(raw) {
     var parts = String(raw).split(/[\n\r,;]+/).map(RT.cleanName).filter(Boolean);
     if (!parts.length) return;
-    var problems = [];
+    var found = [];
     parts.forEach(function (name) {
       if (RT.nameBytes(name) > RT.MAX_NAME_BYTES) {
-        problems.push('“' + name + '” is too long.');
+        found.push({ key: 'errTooLong', name: name });
       } else if (names.some(function (n) { return RT.nameKey(n) === RT.nameKey(name); })) {
-        problems.push('“' + name + '” is already in the list.');
+        found.push({ key: 'errDuplicate', name: name });
       } else {
         names.push(name);
       }
     });
-    setError(problems.join(' '));
+    setProblems(found);
     save();
     renderSetup();
   }
@@ -100,25 +109,24 @@
       li.appendChild(el('span', 'name', name));
       var rm = el('button', 'btn-icon', '×');
       rm.type = 'button';
-      rm.title = 'Remove ' + name;
-      rm.setAttribute('aria-label', 'Remove ' + name);
+      rm.title = t('remove', { name: name });
+      rm.setAttribute('aria-label', rm.title);
       rm.addEventListener('click', function () { removeName(i); });
       li.appendChild(rm);
       list.appendChild(li);
     });
-    $('name-count').textContent = names.length;
+    $('name-count').textContent = t('count', { n: names.length });
     $('empty-hint').hidden = names.length > 0;
     $('clear-btn').hidden = names.length === 0;
     $('start-btn').disabled = names.length < 2;
     $('start-hint').textContent =
-      names.length < 2 ? 'Add at least 2 names.' :
-      names.length < 3 ? 'With only 2 people, each one can guess the other\'s pair.' : '';
+      names.length < 2 ? t('hintMin') :
+      names.length < 3 ? t('hintTwo') : '';
 
     document.querySelector('input[name=reveal][value=' + options.reveal + ']').checked = true;
     document.querySelector('input[name=mode][value=' + options.mode + ']').checked = true;
-    $('reveal-help').textContent = options.reveal === 'qr'
-      ? 'Each participant scans a QR code and reads the name on their own phone. They can open the link again later.'
-      : 'Each participant taps to show the name on this device, then taps again to hide it.';
+    $('reveal-help').textContent = t(options.reveal === 'qr' ? 'revealHelpQr' : 'revealHelpScreen');
+    renderError();
     $('file-warning').hidden =!(options.reveal === 'qr' && location.protocol === 'file:');
   }
 
@@ -139,9 +147,9 @@
   });
 
   $('clear-btn').addEventListener('click', function () {
-    if (confirm('Remove all ' + names.length + ' names from the list?')) {
+    if (confirm(t('confirmClear', { n: names.length }))) {
       names = [];
-      setError('');
+      setProblems([]);
       save();
       renderSetup();
     }
@@ -180,27 +188,27 @@
       var b = el('button', 'person' + (draw.seen[i] ? ' seen' : ''));
       b.type = 'button';
       b.appendChild(el('span', 'name', name));
-      b.appendChild(el('span', 'status', draw.seen[i] ? '✓ informed' : 'waiting'));
+      b.appendChild(el('span', 'status', t(draw.seen[i] ? 'statusSeen' : 'statusWaiting')));
       b.addEventListener('click', function () { pick(i); });
       box.appendChild(b);
       if (draw.seen[i]) done++;
     });
-    $('progress').textContent = done + ' / ' + draw.names.length;
+    $('progress').textContent = t('progress', { done: done, total: draw.names.length });
     $('all-done').hidden = done !== draw.names.length;
-    $('end-btn').textContent = done === draw.names.length ? 'Finish' : 'Cancel the draw';
+    $('end-btn').textContent = t(done === draw.names.length ? 'finish' : 'cancelDraw');
   }
 
   function pick(i) {
-    if (draw.seen[i] && !confirm(draw.names[i] + ' has already seen their pair.\nShow it again?')) return;
+    if (draw.seen[i] && !confirm(t('confirmReshow', { name: draw.names[i] }))) return;
     current = i;
     $('handover-name').textContent = draw.names[i];
-    $('handover-name-2').textContent = draw.names[i];
+    $('show-btn').textContent = t('showBtn', { name: draw.names[i] });
     show('screen-handover');
   }
 
   $('end-btn').addEventListener('click', function () {
     var done = draw.seen.every(Boolean);
-    if (!done && !confirm('Cancel this draw? The pairing will be lost; a new draw will give different pairs.')) return;
+    if (!done && !confirm(t('confirmCancel'))) return;
     endDraw();
   });
 
@@ -224,13 +232,18 @@
   $('show-btn').addEventListener('click', function () {
     if (!draw || current < 0) return;
     var target = draw.names[draw.targets[current]];
-    $('reveal-giver').textContent = draw.names[current];
+    $('reveal-intro').textContent = t('revealIntro', { name: draw.names[current] });
 
     var qrMode = draw.reveal === 'qr';
     $('reveal-screen').hidden = qrMode;
     $('reveal-qr').hidden = !qrMode;
     if (qrMode) {
-      var url = new URL('r.html', location.href).href.split('#')[0] + '#' + RT.encode(target);
+      // The language is not secret: it goes in the query string. The code goes in the fragment (#),
+      // which browsers never send to the server.
+      var page = new URL('r.html', location.href);
+      page.search = '?lang=' + window.I18n.getLang();
+      page.hash = '';
+      var url = page.href + '#' + RT.encode(target);
       renderQr(url);
       $('qr-link').textContent = url;
     } else {
@@ -256,7 +269,7 @@
 
   function clearSecret() {
     $('reveal-name').textContent = '';
-    $('reveal-giver').textContent = '';
+    $('reveal-intro').textContent = '';
     $('qr').textContent = '';
     $('qr-link').textContent = '';
   }
@@ -269,6 +282,10 @@
     }
   });
 
+  window.I18n.init(function () {
+    renderSetup();
+    if (draw) renderHandout();
+  });
   renderSetup();
   show('screen-setup');
   if (window.matchMedia && !window.matchMedia('(pointer: coarse)').matches) input.focus();
