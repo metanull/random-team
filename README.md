@@ -55,6 +55,19 @@ characters, so they fit in the fixed-size code.
 - **Single loop**: everyone forms one chain, A → B → C → … → A. There are no mutual pairs and no small
   separate groups.
 
+### Language (English / French)
+
+An **EN | FR** switch sits at the top of the setup screen. The participant page has one too.
+
+- **First visit:** the language follows the browser (French browsers start in French). After that the
+  last choice is kept on the device.
+- **QR links:** they carry the operator's language as `?lang=fr` or `?lang=en`, so each participant's
+  phone opens in the same language. The language isn't secret: only the code after `#` is.
+- **Codes don't depend on the language:** the same code decodes to the same name, whatever the
+  language.
+- **Adding a language:** add a dictionary to `js/i18n.js`. A test checks that every language has the
+  same keys.
+
 ## Hosting on GitHub Pages
 
 The app is plain HTML, CSS and JavaScript, with no build step. The workflow
@@ -78,7 +91,8 @@ node --test      # unit tests for the pairing and the codec (Node 18+)
 |---|---|
 | `index.html`, `js/app.js` | Operator app: list, draw, hand-out |
 | `r.html`, `js/reveal.js` | Participant page for QR mode, decodes `#<code>` |
+| `js/i18n.js` | English and French UI text, language detection and switch |
 | `js/core.js` | Pairing and codec, no DOM; used by both pages and by the tests |
 | `css/style.css` | Styles, with light and dark themes |
 | `vendor/qrcode.js` | [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4 (MIT), vendored |
-| `tests/core.test.js` | Tests |
+| `tests/*.test.js` | Tests |

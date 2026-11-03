@@ -10,16 +10,20 @@
 </head>
 <body>
   <main id="app">
+    <div class="lang lang-corner" role="group" data-i18n-aria-label="langLabel">
+      <button type="button" data-lang="en" lang="en">EN</button>
+      <button type="button" data-lang="fr" lang="fr">FR</button>
+    </div>
     <section class="screen screen-center">
       <div id="state-ready" hidden>
-        <p class="muted">Make sure nobody else can see your screen.</p>
-        <button id="reveal-btn" type="button" class="btn btn-primary btn-xl">Show my pair</button>
+        <p class="muted" data-i18n="phonePrivacy"></p>
+        <button id="reveal-btn" type="button" class="btn btn-primary btn-xl" data-i18n="phoneShow"></button>
       </div>
       <div id="state-shown" hidden>
-        <p class="muted">You are paired with</p>
+        <p class="muted" data-i18n="phoneIntro"></p>
         <p class="big-name secret" id="name"></p>
-        <button id="hide-btn" type="button" class="btn btn-xl">Hide</button>
-        <p class="muted small">Keep this link to see it again later.</p>
+        <button id="hide-btn" type="button" class="btn btn-xl" data-i18n="phoneHide"></button>
+        <p class="muted small" data-i18n="phoneKeep"></p>
       </div>
       <div id="state-error" hidden>
         <h1>Random Team</h1>
@@ -28,6 +32,7 @@
     </section>
   </main>
   <script src="js/core.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/reveal.js"></script>
 </body>
 </html>

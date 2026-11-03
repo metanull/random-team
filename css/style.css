@@ -153,3 +153,14 @@ input[type=text]:focus, .btn:focus-visible { outline: 2px solid var(--primary); 
 .qr { width: min(80vw, 320px); margin: 8px auto; background: #fff; padding: 8px; border-radius: 8px; }
 .qr svg { display: block; width: 100%; height: auto; }
 .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; word-break: break-all; color: var(--muted); }
+
+/* Language switch */
+header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.lang { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; flex: none; background: var(--surface); }
+.lang button {
+  appearance: none; border: 0; background: none; color: var(--muted);
+  font: inherit; font-size: 0.8rem; font-weight: 700; padding: 6px 10px; cursor: pointer;
+}
+.lang button[aria-pressed=true] { background: var(--primary); color: var(--primary-text); }
+.lang button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.lang-corner { position: absolute; top: 16px; right: 16px; }
