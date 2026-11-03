@@ -109,6 +109,20 @@ input[type=text]:focus, .btn:focus-visible { outline: 2px solid var(--primary); 
 .names li::before { content: counter(n); color: var(--muted); font-size: 0.85rem; min-width: 1.5em; }
 .names .name { flex: 1; overflow-wrap: anywhere; }
 
+/* Reveal-mode toggle */
+.toggle-group { border: 0; padding: 0; margin: 20px 0 0; }
+.toggle-group legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
+.toggle-group p { margin: 8px 0 0; }
+.toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.toggle label { position: relative; cursor: pointer; }
+.toggle input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.toggle span { display: block; text-align: center; padding: 10px 8px; border-radius: 9px; font-weight: 600; color: var(--muted); }
+.toggle input:checked + span { background: var(--primary); color: var(--primary-text); }
+.toggle input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+
 /* Options */
 .options { margin-top: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
 .options summary { cursor: pointer; font-weight: 600; }

@@ -32,14 +32,18 @@
       <ol id="name-list" class="names"></ol>
       <p id="empty-hint" class="muted">Type a name and press Enter. You can also paste several names separated by new lines or commas. The list is kept on this device.</p>
 
+      <fieldset class="toggle-group">
+        <legend>How participants see their pair</legend>
+        <div class="toggle" role="radiogroup">
+          <label><input type="radio" name="reveal" value="screen" checked><span>On this screen</span></label>
+          <label><input type="radio" name="reveal" value="qr"><span>QR code / link</span></label>
+        </div>
+        <p id="reveal-help" class="muted small"></p>
+        <p id="file-warning" class="warn" hidden>This page is opened from a local file: phones won't be able to open the QR links. Use the hosted version (GitHub Pages) for the QR mode.</p>
+      </fieldset>
+
       <details class="options">
-        <summary>Options</summary>
-        <fieldset>
-          <legend>How participants see their pair</legend>
-          <label><input type="radio" name="reveal" value="screen" checked> On this screen (tap to show, tap to hide)</label>
-          <label><input type="radio" name="reveal" value="qr"> QR code / link to open on their own phone</label>
-          <p id="file-warning" class="warn" hidden>This page is opened from a local file: phones won't be able to open the QR links. Use the hosted version (e.g. GitHub Pages) for the QR mode.</p>
-        </fieldset>
+        <summary>More options</summary>
         <fieldset>
           <legend>Pairing style</legend>
           <label><input type="radio" name="mode" value="any" checked> Fully random (A→B and B→A may happen)</label>

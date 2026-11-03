@@ -116,7 +116,10 @@
 
     document.querySelector('input[name=reveal][value=' + options.reveal + ']').checked = true;
     document.querySelector('input[name=mode][value=' + options.mode + ']').checked = true;
-    $('file-warning').hidden = !(options.reveal === 'qr' && location.protocol === 'file:');
+    $('reveal-help').textContent = options.reveal === 'qr'
+      ? 'Each participant scans a QR code and reads the name on their own phone. They can open the link again later.'
+      : 'Each participant taps to show the name on this device, then taps again to hide it.';
+    $('file-warning').hidden =!(options.reveal === 'qr' && location.protocol === 'file:');
   }
 
   $('add-form').addEventListener('submit', function (e) {

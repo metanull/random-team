@@ -70,6 +70,18 @@ test('codec: round trip, fixed length, varies between calls', () => {
   }
 });
 
+test('codec: decoding is deterministic and stable across draws and versions', () => {
+  // Codes generated once and frozen here. They must keep decoding to the same names forever, whatever
+  // the draw: if this test fails, links already handed out to participants would stop working.
+  const fixtures = {
+    'VIrSXoSpb9lRDAybchmSy1cyM7BLNjTw0ovnTnJxN8YqEcz1-JS0-yLBkTV5IFJF': 'Zoë Müller-Ñúñez',
+    'P9UsRRZbuqHz0iyEAaOxkZu4r2WZ-1PhH2q8C-ziDTZ1Bt6hbPObQ3gwTG1HprOr': 'Alice'
+  };
+  for (const [code, name] of Object.entries(fixtures)) {
+    for (let k = 0; k < 3; k++) assert.equal(RT.decode(code), name);
+  }
+});
+
 test('codec: rejects too long or empty names', () => {
   assert.throws(() => RT.encode(''));
   assert.throws(() => RT.encode('x'.repeat(RT.MAX_NAME_BYTES + 1)));
