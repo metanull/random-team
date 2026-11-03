@@ -164,3 +164,9 @@ header.top { display: flex; align-items: flex-start; justify-content: space-betw
 .lang button[aria-pressed=true] { background: var(--primary); color: var(--primary-text); }
 .lang button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 .lang-corner { position: absolute; top: 16px; right: 16px; }
+
+/* Share (QR / link mode) */
+#share-btn { margin-top: 12px; }
+.share-fallback { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.share-fallback .btn { display: block; text-align: center; text-decoration: none; }
+#share-status:empty { display: none; }

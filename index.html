@@ -94,6 +94,14 @@
         <div id="qr" class="qr" role="img" data-i18n-aria-label="qrAlt"></div>
         <p class="muted small"><span data-i18n="scanHelp"></span><br><span data-i18n="noCamera"></span></p>
         <p class="code small" id="qr-link"></p>
+        <button id="share-btn" type="button" class="btn btn-block" data-i18n="shareBtn">Share link…</button>
+        <div id="share-fallback" class="share-fallback" hidden>
+          <a id="share-whatsapp" class="btn" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a id="share-sms" class="btn" data-i18n="shareSms">SMS</a>
+          <a id="share-mail" class="btn" data-i18n="shareMail">E-mail</a>
+          <button id="copy-btn" type="button" class="btn" data-i18n="copyLink">Copy link</button>
+        </div>
+        <p id="share-status" class="muted small" role="status"></p>
       </div>
       <button id="hide-btn" type="button" class="btn btn-primary btn-xl" data-i18n="hideBtn">Hide &amp; hand back</button>
     </section>

@@ -246,6 +246,7 @@
       var url = page.href + '#' + RT.encode(target);
       renderQr(url);
       $('qr-link').textContent = url;
+      prepareShare(draw.names[current], url);
     } else {
       $('reveal-name').textContent = target;
     }
@@ -267,7 +268,71 @@
     $('qr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 4, scalable: true });
   }
 
+  // ---------------------------------------------------------------------------
+  // Share (QR / link mode): send the link with an app of this device.
+  // Only the encoded link is shared, never the name. No API: the system share sheet
+  // (Web Share) when available, otherwise plain WhatsApp / SMS / e-mail links and copy.
+  // ---------------------------------------------------------------------------
+
+  var shareData = null;
+
+  function prepareShare(recipient, url) {
+    var text = t('shareText', { name: recipient });
+    shareData = { title: 'Random Team', text: text, url: url };
+    var body = text + '\n' + url;
+    $('share-whatsapp').href = 'https://wa.me/?text=' + encodeURIComponent(body);
+    $('share-sms').href = 'sms:?&body=' + encodeURIComponent(body);
+    $('share-mail').href = 'mailto:?subject=' + encodeURIComponent(t('shareSubject')) + '&body=' + encodeURIComponent(body);
+    $('share-fallback').hidden = true;
+    $('share-btn').hidden = false;
+    $('share-status').textContent = '';
+  }
+
+  $('share-btn').addEventListener('click', function () {
+    if (!shareData) return;
+    if (navigator.share) {
+      navigator.share(shareData).then(function () {
+        $('share-status').textContent = t('shareDone');
+      }, function (err) {
+        if (err && err.name === 'AbortError') return; // the operator closed the share sheet
+        $('share-fallback').hidden = false;
+      });
+    } else {
+      $('share-fallback').hidden = false;
+      $('share-btn').hidden = true;
+    }
+  });
+
+  $('copy-btn').addEventListener('click', function () {
+    if (!shareData) return;
+    var done = function () { $('share-status').textContent = t('copied'); };
+    var url = shareData.url;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, function () { legacyCopy(url) && done(); });
+    } else if (legacyCopy(url)) {
+      done();
+    }
+  });
+
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
   function clearSecret() {
+    shareData = null;
+    ['share-whatsapp', 'share-sms', 'share-mail'].forEach(function (id) { $(id).removeAttribute('href'); });
+    $('share-fallback').hidden = true;
+    $('share-status').textContent = '';
     $('reveal-name').textContent = '';
     $('reveal-intro').textContent = '';
     $('qr').textContent = '';

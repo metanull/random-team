@@ -48,6 +48,21 @@ In QR mode the link looks like `…/r.html#<64-character code>`:
 Names are limited to 42 bytes of UTF-8, which is about 42 Latin letters or fewer accented or non-Latin
 characters, so they fit in the fixed-size code.
 
+### Sending the link instead (QR / link mode)
+
+The QR screen also has a **Share link…** button, for people who aren't there in person:
+
+- **On a phone,** it opens the system share sheet, so the operator can send the link with WhatsApp,
+  SMS, e-mail, Signal or any other app on the device. This uses the browser's built-in
+  [Web Share](https://developer.mozilla.org/docs/Web/API/Navigator/share) feature; there's no API,
+  account or server.
+- **Where Web Share isn't available** (e.g. Firefox on desktop), the button shows plain **WhatsApp**
+  (`wa.me`), **SMS** (`sms:`) and **E-mail** (`mailto:`) links, plus **Copy link**.
+
+The message only contains the recipient's name (for example "Hi Alice, here is your draw…") and the
+encoded link, never the name they drew. Messaging apps that build link previews never see the code,
+because it sits after the `#`.
+
 ### Pairing styles (More options)
 
 - **Fully random** (default): a uniformly random *derangement*. Every valid pairing is equally likely,
