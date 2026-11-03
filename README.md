@@ -75,6 +75,11 @@ The app is plain HTML, CSS and JavaScript, with no build step. The workflow
 repository's **default branch**, it also publishes the app files to GitHub Pages. This needs
 *Settings → Pages → Source: GitHub Actions*.
 
+Dependabot (`.github/dependabot.yml`) checks the GitHub Actions versions every week. The
+`.github/workflows/dependabot-automerge.yml` workflow turns on auto-merge for its **minor and patch**
+updates. Major updates are left for manual review. To make auto-merge wait for the tests, mark the
+`test` check as required in the branch ruleset for `main`.
+
 The app is served at `https://<owner>.github.io/<repo>/`.
 
 To run it locally, open `index.html` directly, or serve the folder with
