@@ -59,6 +59,10 @@ The QR screen also has a **Share link…** button, for people who aren't there i
 - **Where Web Share isn't available** (e.g. Firefox on desktop), the button shows plain **WhatsApp**
   (`wa.me`), **SMS** (`sms:`) and **E-mail** (`mailto:`) links, plus **Copy link**.
 
+In QR / link mode, each name in the hand-out list also gets a **share icon**. It sends that
+person's link straight away, without going through the "I'm X — show my pair" screen, and marks them as
+informed once the link has been handed to an app. Sending the link again asks for confirmation first.
+
 The message only contains the recipient's name (for example "Hi Alice, here is your draw…") and the
 encoded link, never the name they drew. Messaging apps that build link previews never see the code,
 because it sits after the `#`.

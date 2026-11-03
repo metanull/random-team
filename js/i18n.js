@@ -45,6 +45,7 @@
 
       handoutTitle: 'Draw done',
       handoutHelp: 'Pick the next participant, then hand them the device.',
+      handoutHelpQr: 'Tap a name to hand the device over, or tap the share icon to send that person their link.',
       progress: '{done} / {total} informed',
       statusWaiting: 'waiting',
       statusSeen: '✓ informed',
@@ -72,6 +73,9 @@
       shareMail: 'E-mail',
       copyLink: 'Copy link',
       copied: 'Link copied.',
+      shareFor: 'Send {name}\'s link',
+      confirmReshare: '{name} has already been informed.\nSend their link again?',
+      close: 'Close',
 
       phonePrivacy: 'Make sure nobody else can see your screen.',
       phoneShow: 'Show my pair',
@@ -111,6 +115,7 @@
 
       handoutTitle: 'Tirage effectué',
       handoutHelp: 'Choisissez le participant suivant, puis donnez-lui l\'appareil.',
+      handoutHelpQr: 'Touchez un nom pour donner l\'appareil, ou l\'icône de partage pour envoyer son lien à la personne.',
       progress: '{done} / {total} informés',
       statusWaiting: 'en attente',
       statusSeen: '✓ informé',
@@ -138,6 +143,9 @@
       shareMail: 'E-mail',
       copyLink: 'Copier le lien',
       copied: 'Lien copié.',
+      shareFor: 'Envoyer son lien à {name}',
+      confirmReshare: '{name} a déjà été informé(e).\nRenvoyer son lien ?',
+      close: 'Fermer',
 
       phonePrivacy: 'Assurez-vous que personne d\'autre ne voit votre écran.',
       phoneShow: 'Afficher mon tirage',
